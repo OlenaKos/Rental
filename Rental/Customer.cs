@@ -29,48 +29,56 @@ namespace Rental
         public string Statement()
         {
             // Сначала мы объявляем какие-то локальные переменные.
-            double totalAmount = 0;
-            int frequentRenterPoints = 0;
             string result = string.Format("Учет аренды для {0}: ", name);
 
             // Затем для каждого клиента мы рассчитываем задолженность...
             foreach (Rental rental in rentals)
             {
-                double thisAmount = 0;
-
-                // Определить сумму для каждой строки.
-                switch (rental.Movie.PriceCode)
-                {
-                    case Movie.REGULAR:
-                        thisAmount += 2;
-                        if (rental.DaysRented > 2)
-                            thisAmount += (rental.DaysRented - 2) * 1.5;
-                        break;
-                    case  Movie.NEW_RELEASE:
-                        thisAmount += rental.DaysRented * 3;
-                        break;
-                    case Movie.CHILDRENS:
-                        thisAmount += 1.5;
-                        if (rental.DaysRented > 3)
-                            thisAmount += (rental.DaysRented - 3) * 1.5;
-                        break;
-                }
-
-                // Добавить очки для активного арендатора.
-                frequentRenterPoints++;
-
-                // Бонус за аренду новинки на два дня.
-                if ((rental.Movie.PriceCode == Movie.NEW_RELEASE) && rental.DaysRented > 1)
-                    frequentRenterPoints++;
-
                 // Показать результаты для этой аренды
-                result += "\t" + rental.Movie.Title + "\t" + thisAmount + "\n";
-                totalAmount += thisAmount;
+                result += "\t" + rental.Movie.Title + "\t" + rental.GetCharge() + "\n";
             }
 
             // Добавить нижний колонтитул 
-            result += "Сумма задолженности составляет " + totalAmount + "\n";
-            result += "Вы заработали " + frequentRenterPoints + " очков за активность";
+            result += "Сумма задолженности составляет " + GetTotalCharge() + "\n";
+            result += "Вы заработали " + GetTotalFrequentRenterPoints()+ " очков за активность";
+            return result;
+        }
+
+
+        public string HTMLStatement()
+        {
+            // Сначала мы объявляем какие-то локальные переменные.
+            string result = "<H1>Операции аренды для <EM>" +Name +"</EM><H1><P>\n";
+
+            // Затем для каждого клиента мы рассчитываем задолженность...
+            foreach (Rental rental in rentals)
+            {
+                // Показать результаты для этой аренды
+                result += rental.Movie.Title + rental.GetCharge() + "<BR>\n";
+            }
+
+            // Добавить нижний колонтитул 
+            result += "<P>Сумма задолженности составляет <EM>" + GetTotalCharge() + "</EM><P>\n";
+            result += "Вы заработали <EM>" + GetTotalFrequentRenterPoints() + "<EM> очков за активность<P>";
+            return result;
+        }
+        private double GetTotalFrequentRenterPoints()
+        {
+            double result = 0;
+            foreach (Rental rental in rentals)
+            {
+                result += rental.GetCharge();
+            }
+            return result;
+        }
+
+        private double GetTotalCharge()
+        {
+            double result = 0;
+            foreach (Rental rental in rentals)
+            {
+                result += rental.getFrequentRenterPoints();
+            }
             return result;
         }
 
@@ -85,5 +93,6 @@ namespace Rental
         {
             get { return this.name; }
         }
+
     }
 }

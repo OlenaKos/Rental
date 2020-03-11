@@ -31,5 +31,16 @@ namespace Rental
         {
             get { return this.daysRented; }
         }
+
+        public double GetCharge()
+        {
+            return movie.GetCharge(daysRented);
+        }
+
+        public int getFrequentRenterPoints()
+
+        {
+            return movie.getFrequentRenterPoints(daysRented);
+        }
     }
 }
